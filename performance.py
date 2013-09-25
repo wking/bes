@@ -6,6 +6,25 @@ import socket
 import datetime
 import json
 
+try:
+    from django.conf import settings as _django_settings
+except ImportError as e:
+    _django_settings = None
+
+
+DEFAULT = {
+    'host': 'localhost',
+    'port': 9700,
+    'protocol': 'UDP',
+    }
+
+
+if _django_settings and _django_settings.configured:
+    for key,value in DEFAULT.items():
+        django_key = 'ELASTIC_SEARCH_LOGGING_{}'.format(key.upper())
+        DEFAULT[key] = getattr(_django_settings, django_key, value)
+
+
 ### These have dumb names, but we might want them in some form? ###
 def log_request(request):
     log(request.user, 'request', body=request.read())
@@ -43,27 +62,30 @@ def log(who, what, **kwargs):
 
     emit(index, payload)
 
-def emit(index, payload):
+def emit(index, payload, host=None, port=None, protocol=None):
     """
-    This function broadcasts data via UDP to ElasticSearch
+    This function send data to ElasticSearch
     """
     #TODO indexes, types, and what Kibana likes.
     #Try it out and adjust
     #throwing all of payloads **kwargs into an 'additional' or simular field might 
     #required, and I don't know what happens if we send different data types with
     #the same name ie a **kwargs of my_special_key: str and my_special_key: {'foo': 'bar'}
-
-    try:
-        host = settings.PERFORMANCE_LOGGING_HOST
-        port = settings.PERFORMANCE_LOGGING_PORT
-    except NameError:
-        host = '127.0.0.1'
-        port = 9700
+    if host is None:
+        host = DEFAULT['host']
+    if port is None:
+        port = DEFAULT['port']
+    if protocol is None:
+        protocol = DEFAULT['protocol']
+    if protocol == 'UDP':
+        socket_type = socket.SOCK_DGRAM
+    else:
+        raise NotImplementedError(protocol)
 
     index_json_str = """{ "index": {"_index": "%s", "_type": "%s"} }""" %(index, "record")
     message =  "%s\n%s\n" % (index_json_str, json.dumps(payload))
     print message
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_INET, socket_type)
     sock.sendto(message,(host, port))
     sock.close()
 
