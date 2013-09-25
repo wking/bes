@@ -4,12 +4,16 @@ Log actions to Elastic Search (via UDP)
 
 import datetime as _datetime
 import json as _json
+import logging as _logging
 import socket as _socket
 
 try:
     from django.conf import settings as _django_settings
 except ImportError as e:
     _django_settings = None
+
+
+LOG = _logging.getLogger(__name__)
 
 
 DEFAULT = {
@@ -104,11 +108,15 @@ def emit(payload, host=None, port=None, protocol=None,
         '',
         ])
 
-    print message
+    LOG.debug(message)
     sock = _socket.socket(_socket.AF_INET, socket_type)
     sock.sendto(message,(host, port))
     sock.close()
 
+
 if __name__ == '__main__':
+    LOG.addHandler(_logging.StreamHandler())
+    LOG.setLevel(_logging.DEBUG)
+
     for i in range(10):
         log(who='somebody', what='Did something %sx times' % i)
