@@ -47,6 +47,45 @@ def quick_log(request, what, **kwargs):
 #-----------------------------------------------------------------------------#
 # Real stuff
 #-----------------------------------------------------------------------------#
+class Connection(object):
+    """A socket connecting to Elastic Search
+
+    Use a context manager for PEP 343's 'with' syntax:
+
+    >>> with Connection(host='localhost', port=1234) as c:
+    ...     c.send(message='hello!')
+    """
+    def __init__(self, host=None, port=None, protocol=None):
+        if host is None:
+            host = DEFAULT['host']
+        if port is None:
+            port = DEFAULT['port']
+        if protocol is None:
+            protocol = DEFAULT['protocol']
+        self.host = host
+        self.port = port
+        if protocol == 'UDP':
+            self.socket_type = _socket.SOCK_DGRAM
+        else:
+            raise NotImplementedError(protocol)
+        self._sock = None
+
+    def __enter__(self):
+        self._sock = _socket.socket(_socket.AF_INET, self.socket_type)
+        return self
+
+    def __exit__(self, *exc_info):
+        if self._sock is not None:
+            try:
+                self._sock.close()
+            finally:
+                self._sock = None
+
+    def send(self, message):
+        LOG.debug(message)
+        self._sock.sendto(message, (self.host, self.port))
+
+
 def log(**kwargs):
     """Log an arbitrary payload dictionary to Elastic Search
 
@@ -59,32 +98,23 @@ def log(**kwargs):
     emit(payload=kwargs)
 
 
-def emit(payload, host=None, port=None, protocol=None,
-         index=None, datestamp_index=None, type=None):
-    """
-    This function send data to ElasticSearch
+def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
+    """Send bulk-upload data to Elastic Search
+
+    http://www.elasticsearch.org/guide/reference/api/bulk/
+    http://www.elasticsearch.org/guide/reference/api/bulk-udp/
     """
     #TODO indexes, types, and what Kibana likes.
     #Try it out and adjust
     #throwing all of payloads **kwargs into an 'additional' or simular field might 
     #required, and I don't know what happens if we send different data types with
     #the same name ie a **kwargs of my_special_key: str and my_special_key: {'foo': 'bar'}
-    if host is None:
-        host = DEFAULT['host']
-    if port is None:
-        port = DEFAULT['port']
-    if protocol is None:
-        protocol = DEFAULT['protocol']
     if index is None:
         index = DEFAULT['index']
     if type is None:
         type = DEFAULT['type']
     if datestamp_index is None:
         datestamp_index = DEFAULT['datestamp_index']
-    if protocol == 'UDP':
-        socket_type = _socket.SOCK_DGRAM
-    else:
-        raise NotImplementedError(protocol)
     if datestamp_index:
         index = '-'.join([
             index,
@@ -103,10 +133,8 @@ def emit(payload, host=None, port=None, protocol=None,
         '',
         ])
 
-    LOG.debug(message)
-    sock = _socket.socket(_socket.AF_INET, socket_type)
-    sock.sendto(message,(host, port))
-    sock.close()
+    with Connection(**kwargs) as connection:
+        connection.send(message)
 
 
 if __name__ == '__main__':
