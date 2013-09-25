@@ -47,21 +47,16 @@ def quick_log(request, what, **kwargs):
 #-----------------------------------------------------------------------------#
 # Real stuff
 #-----------------------------------------------------------------------------#
-def log(who, what, **kwargs):
-    """
-    This function combines in arguments, possibly setting an index,
-    adds a consistant timestamp and hands it off to ElasticSearch
-    """
-    payload = {
-        'who': who,
-        'what': what,
-        'when': _datetime.datetime.utcnow().isoformat()
-    }
+def log(**kwargs):
+    """Log an arbitrary payload dictionary to Elastic Search
 
-    for key, value in kwargs.iteritems():
-        payload[key] = value
-
-    emit(payload=payload, **kwargs)
+    Uses the default connection configuration.  If you need to
+    override any of them, build your payload dict by hand and use
+    emit() instead.
+    """
+    kwargs['@timestamp'] = _datetime.datetime.utcnow().isoformat()
+    kwargs['@version'] = 1
+    emit(payload=kwargs)
 
 
 def emit(payload, host=None, port=None, protocol=None,
