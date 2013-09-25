@@ -2,9 +2,9 @@
 Log actions to Elastic Search (via UDP)
 """
 
-import socket
-import datetime
-import json
+import datetime as _datetime
+import json as _json
+import socket as _socket
 
 try:
     from django.conf import settings as _django_settings
@@ -48,14 +48,14 @@ def log(who, what, **kwargs):
     payload = {
         'who': who,
         'what': what,
-        'when': datetime.datetime.utcnow().isoformat()
+        'when': _datetime.datetime.utcnow().isoformat()
     }
 
     if 'index' in kwargs.keys():
         index = kwargs['index']
         del kwargs['index']
     else:
-        index = 'performance-' + datetime.date.today().strftime('%Y.%m.%d')
+        index = 'performance-' + _datetime.date.today().strftime('%Y.%m.%d')
 
     for key, value in kwargs.iteritems():
         payload[key] = value
@@ -78,14 +78,14 @@ def emit(index, payload, host=None, port=None, protocol=None):
     if protocol is None:
         protocol = DEFAULT['protocol']
     if protocol == 'UDP':
-        socket_type = socket.SOCK_DGRAM
+        socket_type = _socket.SOCK_DGRAM
     else:
         raise NotImplementedError(protocol)
 
     index_json_str = """{ "index": {"_index": "%s", "_type": "%s"} }""" %(index, "record")
-    message =  "%s\n%s\n" % (index_json_str, json.dumps(payload))
+    message =  "%s\n%s\n" % (index_json_str, _json.dumps(payload))
     print message
-    sock = socket.socket(socket.AF_INET, socket_type)
+    sock = _socket.socket(_socket.AF_INET, socket_type)
     sock.sendto(message,(host, port))
     sock.close()
 
