@@ -16,6 +16,9 @@ DEFAULT = {
     'host': 'localhost',
     'port': 9700,
     'protocol': 'UDP',
+    'index': 'log',
+    'datestamp_index': False,
+    'type': 'record',
     }
 
 
@@ -51,18 +54,14 @@ def log(who, what, **kwargs):
         'when': _datetime.datetime.utcnow().isoformat()
     }
 
-    if 'index' in kwargs.keys():
-        index = kwargs['index']
-        del kwargs['index']
-    else:
-        index = 'performance-' + _datetime.date.today().strftime('%Y.%m.%d')
-
     for key, value in kwargs.iteritems():
         payload[key] = value
 
-    emit(index, payload)
+    emit(payload=payload, **kwargs)
 
-def emit(index, payload, host=None, port=None, protocol=None):
+
+def emit(payload, host=None, port=None, protocol=None,
+         index=None, datestamp_index=None, type=None):
     """
     This function send data to ElasticSearch
     """
@@ -77,13 +76,34 @@ def emit(index, payload, host=None, port=None, protocol=None):
         port = DEFAULT['port']
     if protocol is None:
         protocol = DEFAULT['protocol']
+    if index is None:
+        index = DEFAULT['index']
+    if type is None:
+        type = DEFAULT['type']
+    if datestamp_index is None:
+        datestamp_index = DEFAULT['datestamp_index']
     if protocol == 'UDP':
         socket_type = _socket.SOCK_DGRAM
     else:
         raise NotImplementedError(protocol)
+    if datestamp_index:
+        index = '-'.join([
+            index,
+            _datetime.date.today().strftime('%Y.%m.%d'),
+            ])
 
-    index_json_str = """{ "index": {"_index": "%s", "_type": "%s"} }""" %(index, "record")
-    message =  "%s\n%s\n" % (index_json_str, _json.dumps(payload))
+    index_data = {
+        'index': {
+            '_index': index,
+            '_type': type,
+            },
+        }
+    message = '\n'.join([
+        _json.dumps(index_data),
+        _json.dumps(payload),
+        '',
+        ])
+
     print message
     sock = _socket.socket(_socket.AF_INET, socket_type)
     sock.sendto(message,(host, port))
@@ -91,4 +111,4 @@ def emit(index, payload, host=None, port=None, protocol=None):
 
 if __name__ == '__main__':
     for i in range(10):
-        log('somebody', 'Did something %sx times' % i)
+        log(who='somebody', what='Did something %sx times' % i)
