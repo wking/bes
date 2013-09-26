@@ -118,7 +118,7 @@ def emit(payload, index=None, datestamp_index=None, type=None,
             '',
         ])
     except TypeError:
-        LOG.error("Unable to serlialize %s to json" % payload)
+        LOG.error('Unable to serlialize {!r} to json'.format(payload))
         message = '\n'.join([
             _json.dumps(index_data, sort_keys=sort_keys),
             _json.dumps({"error": "unable to serialize"}, sort_keys=sort_keys),
