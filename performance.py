@@ -86,20 +86,26 @@ class Connection(object):
         self._sock.sendto(message, (self.host, self.port))
 
 
-def log(**kwargs):
+def log(index=None, type=None, **kwargs):
     """Log an arbitrary payload dictionary to Elastic Search
 
     Uses the default connection configuration.  If you need to
     override any of them, build your payload dict by hand and use
     emit() instead.
+
+    You can optionally override the index and type of payload, for
+    later filtering in Elastic Search.  This means that `index` and
+    `type` are not available as payload keys.
     """
     kwargs['@timestamp'] = _datetime.datetime.utcnow().isoformat()
     kwargs['@version'] = 1
-    emit(payload=kwargs)
+    emit(payload=kwargs, index=index, type=type)
 
 
 def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
     """Send bulk-upload data to Elastic Search
+
+    Uses the 'index' action to add or replace a document as necessary.
 
     http://www.elasticsearch.org/guide/reference/api/bulk/
     http://www.elasticsearch.org/guide/reference/api/bulk-udp/
@@ -141,5 +147,5 @@ if __name__ == '__main__':
     LOG.addHandler(_logging.StreamHandler())
     LOG.setLevel(_logging.DEBUG)
 
-    for i in range(10):
+    for i in range(3):
         log(who='somebody', what='Did something %sx times' % i)
