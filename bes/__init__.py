@@ -115,5 +115,8 @@ def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
         '',
         ])
 
+    if hasattr(message, 'encode'):
+        message = message.encode('utf-8')  # convert str to bytes for Python 3
+
     with Connection(**kwargs) as connection:
         connection.send(message)
