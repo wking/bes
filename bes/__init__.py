@@ -8,6 +8,8 @@ import logging as _logging
 import socket as _socket
 
 
+__version__ = '0.1'
+
 LOG = _logging.getLogger(__name__)
 
 
@@ -115,11 +117,3 @@ def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
 
     with Connection(**kwargs) as connection:
         connection.send(message)
-
-
-if __name__ == '__main__':
-    LOG.addHandler(_logging.StreamHandler())
-    LOG.setLevel(_logging.DEBUG)
-
-    for i in range(3):
-        log(who='somebody', what='Did something %sx times' % i)
