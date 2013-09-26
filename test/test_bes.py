@@ -1,4 +1,5 @@
 import unittest as _unittest
+import unittest.mock as _mock
 
 import bes as _bes
 from . import udp_listener as _udp_listener
@@ -19,13 +20,9 @@ class ConnectionTestCase (_unittest.TestCase):
 
 class EmitTestCase (_unittest.TestCase):
     def _call_emit(self, *args, **kwargs):
-        with _udp_listener.UDPListener(count=1) as listener:
-            _bes.emit(
-                host=listener.host, port=listener.port, protocol='UDP',
-                sort_keys=True, *args, **kwargs)
-        self.assertEqual(len(listener.messages), 1)
-        self.assertEqual(len(listener.messages), 1)
-        return listener.messages[0][0]
+        return _bes.emit(
+            sort_keys=True, connection_class=_mock.MagicMock(),
+            *args, **kwargs)
 
     def test_emit(self):
         message = self._call_emit(
