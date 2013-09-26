@@ -68,3 +68,16 @@ class LogTestCase (_unittest.TestCase):
                 b'{"@timestamp": "YYYY-MM-DDTHH:MM:SS.XXXXXX", "@version": 1, "user_id": null, "username": ""}',
                 b'',
             ]))
+
+    def test_log_user_request(self):
+        request = _http.HttpRequest()
+        request.user = _auth.User(id=123, username='jdoe')
+        message = _bes_django.log_user(request=request, sort_keys=True)
+        message, timestamp = clean_message(message)
+        self.assertEqual(
+            message,
+            b'\n'.join([
+                b'{"index": {"_index": "log", "_type": "user-action"}}',
+                b'{"@timestamp": "YYYY-MM-DDTHH:MM:SS.XXXXXX", "@version": 1, "user_id": 123, "username": "jdoe"}',
+                b'',
+            ]))
