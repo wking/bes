@@ -22,7 +22,7 @@ class EmitTestCase (_unittest.TestCase):
         with _udp_listener.UDPListener(count=1) as listener:
             _bes.emit(
                 host=listener.host, port=listener.port, protocol='UDP',
-                *args, **kwargs)
+                sort_keys=True, *args, **kwargs)
         self.assertEqual(len(listener.messages), 1)
         self.assertEqual(len(listener.messages), 1)
         return listener.messages[0][0]
@@ -33,7 +33,7 @@ class EmitTestCase (_unittest.TestCase):
         self.assertEqual(
             message,
             b'\n'.join([
-                b'{"index": {"_type": "record", "_index": "log"}}',
-                b'{"hello": "world", "goodbye": "everybody"}',
+                b'{"index": {"_index": "log", "_type": "record"}}',
+                b'{"goodbye": "everybody", "hello": "world"}',
                 b'',
             ]))
