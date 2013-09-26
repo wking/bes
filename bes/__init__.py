@@ -87,11 +87,6 @@ def emit(payload, index=None, datestamp_index=None, type=None,
     http://www.elasticsearch.org/guide/reference/api/bulk/
     http://www.elasticsearch.org/guide/reference/api/bulk-udp/
     """
-    #TODO indexes, types, and what Kibana likes.
-    #Try it out and adjust
-    #throwing all of payloads **kwargs into an 'additional' or simular field might 
-    #required, and I don't know what happens if we send different data types with
-    #the same name ie a **kwargs of my_special_key: str and my_special_key: {'foo': 'bar'}
     if index is None:
         index = DEFAULT['index']
     if type is None:
