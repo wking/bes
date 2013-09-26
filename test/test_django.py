@@ -124,3 +124,19 @@ class LogTestCase (_unittest.TestCase):
                 b'{"@timestamp": "YYYY-MM-DDTHH:MM:SS.XXXXXX", "@version": 1, "request_path": "/music/bands/the_beatles/?print=true", "user_id": 123, "username": "jdoe"}',
                 b'',
             ]))
+
+    def test_log_request_body(self):
+        request = _http.HttpRequest()
+        request.user = _auth.User(id=123, username='jdoe')
+        request.path = '/music/bands/the_beatles/'
+        request.META = {'QUERY_STRING': 'print=true'}
+        request.read = lambda: b'Hey Jude'
+        message = _bes_django.log_request_body(request=request, sort_keys=True)
+        message, timestamp = clean_message(message)
+        self.assertEqual(
+            message,
+            b'\n'.join([
+                b'{"index": {"_index": "log", "_type": "request"}}',
+                b'{"@timestamp": "YYYY-MM-DDTHH:MM:SS.XXXXXX", "@version": 1, "request_body": "Hey Jude", "request_path": "/music/bands/the_beatles/?print=true", "user_id": 123, "username": "jdoe"}',
+                b'',
+            ]))
