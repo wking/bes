@@ -7,7 +7,16 @@ Getting Started With bes
 bes is a flexible `bulk uploader`_ for `Elastic Search`_.  At the
 moment, it only supports index uploads `over UDP`_.  Good luck!
 
+Testing
+=======
+
+Testing uses unittest's `automatic test discovery`_.  Run the test
+suite with::
+
+  $ python -m unittest discover
 
 .. _Elastic Search: http://www.elasticsearch.org/
 .. _bulk uploader: http://www.elasticsearch.org/guide/reference/api/bulk/
 .. _over UDP: http://www.elasticsearch.org/guide/reference/api/bulk-udp/
+.. _automatic test discovery:
+   http://docs.python.org/3/library/unittest.html#unittest-test-discovery
