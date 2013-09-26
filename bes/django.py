@@ -19,7 +19,7 @@ def log_user(type='user-action', request=None, **kwargs):
     https://docs.djangoproject.com/en/dev/ref/request-response/
     https://docs.djangoproject.com/en/dev/topics/auth/default/#user-objects
     """
-    _bes.log(
+    return _bes.log(
         type=type,
         user_id=request.user.id,
         username=request.user.username,
@@ -29,7 +29,7 @@ def log_user(type='user-action', request=None, **kwargs):
 def log_request_path(type='request', request=None, **kwargs):
     """Like log_user, but also adds the request path
     """
-    log_user(
+    return log_user(
         type=type,
         request=request,
         request_path=request.get_full_path(),
@@ -39,7 +39,7 @@ def log_request_path(type='request', request=None, **kwargs):
 def log_request_body(request=None, **kwargs):
     """Like log_request_path, but also adds the request body
     """
-    log_request_path(
+    return log_request_path(
         request=request,
         request_body=request.read(),
         **kwargs)

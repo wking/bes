@@ -75,11 +75,11 @@ def log(index=None, type=None, sort_keys=False, **kwargs):
     """
     kwargs['@timestamp'] = _datetime.datetime.utcnow().isoformat()
     kwargs['@version'] = 1
-    emit(payload=kwargs, index=index, type=type, sort_keys=sort_keys)
+    return emit(payload=kwargs, index=index, type=type, sort_keys=sort_keys)
 
 
 def emit(payload, index=None, datestamp_index=None, type=None,
-         sort_keys=False, **kwargs):
+         sort_keys=False, connection_class=Connection, **kwargs):
     """Send bulk-upload data to Elastic Search
 
     Uses the 'index' action to add or replace a document as necessary.
@@ -119,5 +119,7 @@ def emit(payload, index=None, datestamp_index=None, type=None,
     if hasattr(message, 'encode'):
         message = message.encode('utf-8')  # convert str to bytes for Python 3
 
-    with Connection(**kwargs) as connection:
+    with connection_class(**kwargs) as connection:
         connection.send(message)
+
+    return message
