@@ -32,21 +32,6 @@ if _django_settings and _django_settings.configured:
         DEFAULT[key] = getattr(_django_settings, django_key, value)
 
 
-### These have dumb names, but we might want them in some form? ###
-def log_request(request):
-    log(request.user, 'request', body=request.read())
-
-def realy_quick_log(request):
-    log(request.user, request.get_full_path())
-
-def quick_log(request, what, **kwargs):
-    log(request.user, what, **kwargs)
-
-
-
-#-----------------------------------------------------------------------------#
-# Real stuff
-#-----------------------------------------------------------------------------#
 class Connection(object):
     """A socket connecting to Elastic Search
 
@@ -141,6 +126,42 @@ def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
 
     with Connection(**kwargs) as connection:
         connection.send(message)
+
+
+def log_django_user(type='user-action', request=None, **kwargs):
+    """Log activity requested by a Django user
+
+    This uses request.user.id and request.user.username.  That's what
+    you get with the default contrib.auth.User, but likely you'll have
+    them even if you override AUTH_USER_MODEL.
+
+    https://docs.djangoproject.com/en/dev/ref/request-response/
+    https://docs.djangoproject.com/en/dev/topics/auth/default/#user-objects
+    """
+    log(
+        type=type,
+        user_id=request.user.id,
+        username=request.user.username,
+        **kwargs)
+
+
+def log_django_request_path(type='request', request=None, **kwargs):
+    """Like log_django_user, but also adds the request path
+    """
+    log_django_user(
+        type=type,
+        request=request,
+        request_path=request.get_full_path(),
+        **kwargs)
+
+
+def log_django_request_body(request=None, **kwargs):
+    """Like log_django_request_path, but also adds the request body
+    """
+    log_django_request_path(
+        request=request,
+        request_body=request.read(),
+        **kwargs)
 
 
 if __name__ == '__main__':
