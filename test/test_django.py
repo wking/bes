@@ -30,6 +30,8 @@ else:
         _settings_error = None
         _settings = None
 
+import bes as _bes
+
 
 DATE_TIME_REGEXP = _re.compile(
     r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[.]\d{6}')
@@ -52,6 +54,14 @@ def skip_if_settings_is_none(obj):
     if _settings is None:
         return _unittest.skip(str(_settings_error))(obj)
     return obj
+
+
+@skip_if_settings_is_none
+class ConfigTestCase (_unittest.TestCase):
+    def test_django_config_override_default(self):
+        self.assertEqual(
+            _bes.DEFAULT['port'],
+            _settings.BULK_ELASTIC_SEARCH_LOGGING_PORT)
 
 
 @skip_if_settings_is_none
