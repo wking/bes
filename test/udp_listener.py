@@ -15,6 +15,7 @@ class UDPListener (object):
     def __enter__(self):
         self._sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM)
         self._sock.bind((self.host, self.port))
+        self._sock.settimeout(1)
         self._thread = _threading.Thread(
             name='UDP server',
             target=self._run)
