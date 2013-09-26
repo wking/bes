@@ -7,7 +7,7 @@ import bes as _bes
 
 if _django_settings.configured:
     for key,value in _bes.DEFAULT.items():
-        django_key = 'ELASTIC_SEARCH_LOGGING_{}'.format(key.upper())
+        django_key = 'BULK_ELASTIC_SEARCH_LOGGING_{}'.format(key.upper())
         _bes.DEFAULT[key] = getattr(_django_settings, django_key, value)
 
 

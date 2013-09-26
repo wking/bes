@@ -13,7 +13,7 @@ except ImportError as e:
 else:
     if not _settings.configured:
         _settings.configure(
-            ELASTIC_SEARCH_LOGGING_PORT=9999,
+            BULK_ELASTIC_SEARCH_LOGGING_PORT=9999,
             # for contrib.auth
             DATABASES={
                 'default': {
