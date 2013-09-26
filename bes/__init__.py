@@ -18,7 +18,7 @@ DEFAULT = {
     'port': 9700,
     'protocol': 'UDP',
     'index': 'log',
-    'datestamp_index': False,
+    'datestamp_index': True,
     'type': 'record',
     }
 
