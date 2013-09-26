@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from django.conf import settings as _django_settings
 
 import bes as _bes
