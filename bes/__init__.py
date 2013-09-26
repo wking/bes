@@ -62,7 +62,7 @@ class Connection(object):
         self._sock.sendto(message, (self.host, self.port))
 
 
-def log(index=None, type=None, **kwargs):
+def log(index=None, type=None, sort_keys=False, **kwargs):
     """Log an arbitrary payload dictionary to Elastic Search
 
     Uses the default connection configuration.  If you need to
@@ -75,10 +75,11 @@ def log(index=None, type=None, **kwargs):
     """
     kwargs['@timestamp'] = _datetime.datetime.utcnow().isoformat()
     kwargs['@version'] = 1
-    emit(payload=kwargs, index=index, type=type)
+    emit(payload=kwargs, index=index, type=type, sort_keys=sort_keys)
 
 
-def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
+def emit(payload, index=None, datestamp_index=None, type=None,
+         sort_keys=False, **kwargs):
     """Send bulk-upload data to Elastic Search
 
     Uses the 'index' action to add or replace a document as necessary.
@@ -110,8 +111,8 @@ def emit(payload, index=None, datestamp_index=None, type=None, **kwargs):
             },
         }
     message = '\n'.join([
-        _json.dumps(index_data),
-        _json.dumps(payload),
+        _json.dumps(index_data, sort_keys=sort_keys),
+        _json.dumps(payload, sort_keys=sort_keys),
         '',
         ])
 
