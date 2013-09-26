@@ -1,5 +1,8 @@
 import unittest as _unittest
-import unittest.mock as _mock
+try:
+    import unittest.mock as _mock
+except ImportError:
+    import mock as _mock
 
 import bes as _bes
 from . import udp_listener as _udp_listener
