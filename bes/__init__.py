@@ -1,5 +1,5 @@
 """
-Log actions to Elastic Search (via UDP)
+Log actions to Elastic Search via bulk upload
 """
 
 import datetime as _datetime
