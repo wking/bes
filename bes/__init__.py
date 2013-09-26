@@ -110,10 +110,20 @@ def emit(payload, index=None, datestamp_index=None, type=None,
             '_type': type,
             },
         }
-    message = '\n'.join([
-        _json.dumps(index_data, sort_keys=sort_keys),
-        _json.dumps(payload, sort_keys=sort_keys),
-        '',
+    #not everything is JSON serializable, and logging should not blow up
+    #how to make these errors easier to track down?
+    try:
+        message = '\n'.join([
+            _json.dumps(index_data, sort_keys=sort_keys),
+            _json.dumps(payload, sort_keys=sort_keys),
+            '',
+        ])
+    except TypeError:
+        LOG.error("Unable to serlialize %s to json" % payload)
+        message = '\n'.join([
+            _json.dumps(index_data, sort_keys=sort_keys),
+            _json.dumps({"error": "unable to serialize"}, sort_keys=sort_keys),
+            '',
         ])
 
     if hasattr(message, 'encode'):
