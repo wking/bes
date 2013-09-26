@@ -1,0 +1,2 @@
+include COPYING
+include test/__init__.py
