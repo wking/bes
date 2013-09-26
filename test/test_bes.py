@@ -32,6 +32,7 @@ class EmitTestCase (_unittest.TestCase):
 
     def test_emit(self):
         message = self._call_emit(
+            type='record',
             payload={'hello': 'world', 'goodbye': 'everybody'})
         self.assertEqual(
             message,

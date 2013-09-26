@@ -19,7 +19,7 @@ DEFAULT = {
     'protocol': 'UDP',
     'index': 'log',
     'datestamp_index': True,
-    'type': 'record',
+    'type': None,
     }
 
 
@@ -103,6 +103,10 @@ def emit(payload, index=None, datestamp_index=None, type=None,
             index,
             _datetime.date.today().strftime('%Y.%m.%d'),
             ])
+
+    if type is None:
+        LOG.error('You must set a type for {!r}'.format(payload))
+        return
 
     index_data = {
         'index': {
