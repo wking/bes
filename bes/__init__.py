@@ -8,7 +8,7 @@ import logging as _logging
 import socket as _socket
 
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 LOG = _logging.getLogger(__name__)
 
