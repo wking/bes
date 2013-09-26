@@ -24,8 +24,11 @@ class ConnectionTestCase (_unittest.TestCase):
 class EmitTestCase (_unittest.TestCase):
     def _call_emit(self, *args, **kwargs):
         return _bes.emit(
-            sort_keys=True, connection_class=_mock.MagicMock(),
-            *args, **kwargs)
+            datestamp_index=False,
+            sort_keys=True,
+            connection_class=_mock.MagicMock(),
+            *args,
+            **kwargs)
 
     def test_emit(self):
         message = self._call_emit(

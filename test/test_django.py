@@ -14,6 +14,7 @@ else:
     if not _settings.configured:
         _settings.configure(
             BULK_ELASTIC_SEARCH_LOGGING_PORT=9999,
+            BULK_ELASTIC_SEARCH_LOGGING_DATESTAMP_INDEX=False,
             # for contrib.auth
             DATABASES={
                 'default': {
