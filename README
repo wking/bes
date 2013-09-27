@@ -85,6 +85,56 @@ The Django config names match the uppercased ``DEFAULT`` keys with a
 ``BULK_ELASTIC_SEARCH_LOGGING_`` prefix (for example, ``host`` →
 ``BULK_ELASTIC_SEARCH_LOGGING_HOST``).
 
+Tracing
+=======
+
+To log activity for critical functions, bes has tracing decorators::
+
+  import bes.trace
+
+  @bes.trace.trace()
+  def my_function():
+      return 1 + 2 / 3
+
+By default this logs with ``bes.log`` using the decorated function's
+name (e.g. ``my_function``) as the log type.  You can override this if
+you want something different::
+
+  def my_logger(*args, **kwargs):
+      print((args, kwargs))
+
+  @bes.trace.trace(type='my-type', logger=my_logger)
+  def my_function():
+      return 1 + 2 / 3
+
+Additional ``trace`` arguments are passed straight through to the
+logger::
+
+  @bes.trace.trace(index='my-index', type='my-type', sport='triathalon')
+  def my_function():
+      return 1 + 2 / 3
+
+By default, you'll get separate logged messages before the decorated
+function starts, after it completes, or if it raises an exception.  An
+``action`` argument is passed to the logger in each case, with values
+of ``start``, ``complete``, and ``error`` respectively.  In the error
+case, the logger is also passed the string-ified exception
+(``error=str(e)``) to help with debugging the problem.  If you don't
+want one or more of these logged messages, you can turn them off::
+
+  @bes.trace.trace(start=False, error=False, complete=False):
+  def my_function():
+      return 1 + 2 / 3
+
+although if you turn them all off, you're not going to get any
+messages at all ;).
+
+The trace decorator uses wrapt_ (if it's installed) to create
+introspection-preserving decorators.  If wrapt is not installed, we
+fallback to the builtin `functools.wraps`_ which handles the basics
+like docstrings, but doesn't do as well for more involved
+introspection (e.g. `inspect.getsource`_).
+
 Testing
 =======
 
@@ -110,6 +160,11 @@ which is bundled as `unittest.mock`_ in Python 3.3.
 .. _HttpRequest:
    https://docs.djangoproject.com/en/dev/ref/request-response/#httprequest-objects
 .. _Django views: https://docs.djangoproject.com/en/dev/topics/http/views/
+.. _wrapt: https://github.com/GrahamDumpleton/wrapt
+.. _functools.wraps:
+   http://docs.python.org/3/library/functools.html#functools.wraps
+.. _inspect.getsource:
+   http://docs.python.org/3/library/inspect.html#inspect.getsource
 .. _automatic test discovery:
    http://docs.python.org/3/library/unittest.html#unittest-test-discovery
 .. _mock: https://pypi.python.org/pypi/mock
