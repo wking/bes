@@ -147,13 +147,13 @@ For Python <3.3, the test suite requires the external mock_ package,
 which is bundled as `unittest.mock`_ in Python 3.3.
 
 .. _Elastic Search: http://www.elasticsearch.org/
-.. _bulk uploader: http://www.elasticsearch.org/guide/reference/api/bulk/
-.. _over UDP: http://www.elasticsearch.org/guide/reference/api/bulk-udp/
+.. _bulk uploader: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html
+.. _over UDP: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk-udp.html
 .. _Kibana: http://www.elasticsearch.org/overview/kibana/
 .. _Kibana source: https://github.com/elasticsearch/kibana
-.. _index: http://www.elasticsearch.org/guide/reference/glossary/#field
-.. _type: http://www.elasticsearch.org/guide/reference/glossary/#type
-.. _mapping: http://www.elasticsearch.org/guide/reference/mapping/
+.. _index: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/glossary.html#glossary-index
+.. _type: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/glossary.html#glossary-type
+.. _mapping: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping.html
 .. _Logstash: http://logstash.net/
 .. _Logstash format: https://logstash.jira.com/browse/LOGSTASH-675
 .. _Django: https://www.djangoproject.com/
